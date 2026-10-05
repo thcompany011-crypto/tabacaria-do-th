@@ -138,7 +138,13 @@ const products = [
   }
 ];
 
-let cart = JSON.parse(localStorage.getItem("thCart") || "{}");
+let cart = {};
+try {
+  cart = JSON.parse(localStorage.getItem("thCart") || "{}");
+  if (!cart || typeof cart !== "object" || Array.isArray(cart)) cart = {};
+} catch (e) {
+  cart = {};
+}
 let activeFilter = "all";
 
 const $ = (selector) => document.querySelector(selector);
@@ -152,7 +158,9 @@ const money = (value) =>
       }).format(value);
 
 function saveCart() {
-  localStorage.setItem("thCart", JSON.stringify(cart));
+  try {
+    localStorage.setItem("thCart", JSON.stringify(cart));
+  } catch (e) {}
   renderCart();
   updateCount();
 }
@@ -435,7 +443,9 @@ $("#clearCart").onclick = () => {
 };
 
 $("#ageYes").onclick = () => {
-  localStorage.setItem("thAge", "yes");
+  try {
+    localStorage.setItem("thAge", "yes");
+  } catch (e) {}
   $("#ageGate").classList.add("hidden");
 };
 
@@ -443,9 +453,11 @@ $("#ageNo").onclick = () => {
   window.location.href = "https://www.google.com/";
 };
 
-if (localStorage.getItem("thAge") === "yes") {
-  $("#ageGate").classList.add("hidden");
-}
+try {
+  if (localStorage.getItem("thAge") === "yes") {
+    $("#ageGate").classList.add("hidden");
+  }
+} catch (e) {}
 
 renderProducts();
 renderCart();
