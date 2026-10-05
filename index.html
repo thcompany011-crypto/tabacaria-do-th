@@ -135,6 +135,33 @@
     </div>
   </aside>
 
+  <script>
+    // Fallback de segurança: o bloqueio de idade continua funcionando
+    // mesmo se o JavaScript principal demorar a carregar.
+    (function () {
+      try {
+        if (localStorage.getItem("thAge") === "yes") {
+          document.getElementById("ageGate").classList.add("hidden");
+        }
+      } catch (e) {}
+
+      var yes = document.getElementById("ageYes");
+      var no = document.getElementById("ageNo");
+
+      if (yes) {
+        yes.addEventListener("click", function () {
+          try { localStorage.setItem("thAge", "yes"); } catch (e) {}
+          document.getElementById("ageGate").classList.add("hidden");
+        });
+      }
+
+      if (no) {
+        no.addEventListener("click", function () {
+          window.location.href = "https://www.google.com/";
+        });
+      }
+    })();
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
