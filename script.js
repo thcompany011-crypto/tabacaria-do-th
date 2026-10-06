@@ -140,8 +140,14 @@ const products = [
 
 let cart = {};
 try {
-  cart = JSON.parse(localStorage.getItem("thCart") || "{}");
-  if (!cart || typeof cart !== "object" || Array.isArray(cart)) cart = {};
+  const storedCart = JSON.parse(localStorage.getItem("thCart") || "{}");
+  if (storedCart && typeof storedCart === "object" && !Array.isArray(storedCart)) {
+    cart = Object.fromEntries(
+      Object.entries(storedCart)
+        .filter(([id, quantity]) => products.some((product) => product.id === Number(id)) && Number.isInteger(quantity) && quantity > 0)
+        .map(([id, quantity]) => [id, Math.min(quantity, 99)])
+    );
+  }
 } catch (e) {
   cart = {};
 }
@@ -158,9 +164,16 @@ const money = (value) =>
       }).format(value);
 
 function saveCart() {
+  cart = Object.fromEntries(
+    Object.entries(cart)
+      .filter(([id, quantity]) => products.some((product) => product.id === Number(id)) && Number.isInteger(quantity) && quantity > 0)
+      .map(([id, quantity]) => [id, Math.min(quantity, 99)])
+  );
+
   try {
     localStorage.setItem("thCart", JSON.stringify(cart));
   } catch (e) {}
+
   renderCart();
   updateCount();
 }
@@ -284,7 +297,7 @@ function renderProducts() {
         return;
       }
 
-      cart[product.id] = (cart[product.id] || 0) + 1;
+      cart[product.id] = Math.min((cart[product.id] || 0) + 1, 99);
       saveCart();
     });
   });
@@ -458,6 +471,47 @@ try {
     $("#ageGate").classList.add("hidden");
   }
 } catch (e) {}
+
+const ageGate = $("#ageGate");
+const ageYes = $("#ageYes");
+const ageNo = $("#ageNo");
+
+function closeAgeGate() {
+  try {
+    localStorage.setItem("thAge", "yes");
+  } catch (e) {}
+  ageGate.classList.add("hidden");
+  document.body.style.overflow = "";
+}
+
+ageYes.addEventListener("click", closeAgeGate);
+
+ageNo.addEventListener("click", () => {
+  window.location.replace("https://www.google.com/");
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !ageGate.classList.contains("hidden")) {
+    ageNo.click();
+    return;
+  }
+
+  if (event.key === "Escape" && $("#cartPanel").classList.contains("open")) {
+    closeCart();
+  }
+});
+
+const originalOpenCart = openCart;
+openCart = function () {
+  originalOpenCart();
+  const closeButton = $("#closeCartButton");
+  if (closeButton) closeButton.focus();
+};
+
+if (!ageGate.classList.contains("hidden")) {
+  document.body.style.overflow = "hidden";
+  ageYes.focus();
+}
 
 renderProducts();
 renderCart();
