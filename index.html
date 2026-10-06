@@ -94,7 +94,7 @@
       <div id="productGrid" class="product-grid"></div>
     </section>
 
-    <section class="about-section">
+    <section class="about-section" id="entrega">
       <div class="container about-grid">
         <article>
           <div class="about-icon">🚚</div>
@@ -136,30 +136,14 @@
   </aside>
 
   <script>
-    // Fallback de segurança: o bloqueio de idade continua funcionando
-    // mesmo se o JavaScript principal demorar a carregar.
+    // Oculta imediatamente a tela 18+ para quem já confirmou a idade.
+    // Os eventos e a validação ficam centralizados no script principal.
     (function () {
       try {
         if (localStorage.getItem("thAge") === "yes") {
           document.getElementById("ageGate").classList.add("hidden");
         }
       } catch (e) {}
-
-      var yes = document.getElementById("ageYes");
-      var no = document.getElementById("ageNo");
-
-      if (yes) {
-        yes.addEventListener("click", function () {
-          try { localStorage.setItem("thAge", "yes"); } catch (e) {}
-          document.getElementById("ageGate").classList.add("hidden");
-        });
-      }
-
-      if (no) {
-        no.addEventListener("click", function () {
-          window.location.href = "https://www.google.com/";
-        });
-      }
     })();
   </script>
   <script src="script.js"></script>
